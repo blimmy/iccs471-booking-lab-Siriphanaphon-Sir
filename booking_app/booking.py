@@ -30,6 +30,13 @@ class BookingService:
             raise ValueError("start and end must be whole minutes")
         if not (0 <= start < end <= 1440):
             raise ValueError("time must satisfy 0 <= start < end <= 1440")
+        if any(
+            existing.room == room
+            and start < existing.end
+            and end > existing.start
+            for existing in self._bookings
+        ):
+            raise ValueError("booking overlaps an existing booking in this room")
 
         booking = Booking(room=room, start=start, end=end, guest=guest)
         self._bookings.append(booking)
